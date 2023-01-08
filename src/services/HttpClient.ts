@@ -10,8 +10,9 @@ export abstract class AbstractApiService {
 
   protected constructor(
     protected readonly path?: string,
+    // @ts-ignore
     protected readonly baseURL: string = import.meta.env.VITE_SERVICE_ENDPOINT ?? '/',
-    protected readonly appIdDummyApi: string = import.meta.env.VITE_APP_ID_DUMMYAPI ?? '',
+    // protected readonly appIdDummyApi: string = import.meta.env.VITE_APP_ID_DUMMYAPI ?? '',
   ) {
     if (path) {
       baseURL += path;
@@ -20,15 +21,14 @@ export abstract class AbstractApiService {
       baseURL,
       // ... further stuff, e.g. `withCredentials: true`
     });
+
     this.http.defaults.headers.common['Accept'] = 'application/json;charset=UTF-8';
     this.http.defaults.headers.common['Content-Type'] = 'application/json;charset=UTF-8';
-    this.http.defaults.headers.common['app-id'] = appIdDummyApi;
+    // this.http.defaults.headers.common['app-id'] = appIdDummyApi;
     this.http.interceptors.request.use(
       config => {
-       if (localStorage.auth) {
-         let accessToken  = localStorage.auth;
-         accessToken = JSON.parse(accessToken);
-         accessToken = accessToken.result.access.token;
+      const accessToken = localStorage.getItem('accessToken')
+       if (accessToken) {
          //@ts-ignore
          config.headers!.Authorization = `Bearer ${accessToken}`;
        }
